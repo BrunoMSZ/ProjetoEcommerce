@@ -167,6 +167,9 @@ def cadastro():
     
     return render_template('cadastroUsuario.html')
 
+@app.route('/conta', methods=['GET','POST'])
+def conta():
+    return render_template('minha_conta.html')
 
 @app.route('/login', methods=['GET','POST'])
 def loginInicial():
