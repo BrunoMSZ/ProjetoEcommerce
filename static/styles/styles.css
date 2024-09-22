@@ -17,7 +17,6 @@ body {
     overflow: hidden;
 }
 
-/* Cabeçalho */
 header {
     background: #232f3e;
     color: #fff;
@@ -35,7 +34,7 @@ header h1 {
 nav ul {
     list-style: none;
     display: flex;
-    margin-right: 20px;
+    margin-right: auto; /* Remove a margem direita para não afetar o botão */
 }
 
 nav ul li {
@@ -57,8 +56,9 @@ nav ul li a {
     cursor: pointer;
     border-radius: 4px;
     font-size: 16px;
-    margin: 0 20px;
+    margin-left: auto; /* Alinha o botão à direita */
 }
+
 
 .login-button:hover {
     background: #e89700;

@@ -9,15 +9,16 @@
 <body>
     <header>
         <div class="container">
-            <h1>Minha Loja</h1>
-            <button class="login-button" onclick="toggleLoginForm()">Login</button>
+            <h1>SonicPads</h1>
             <nav>
                 <ul>
-                    <li><a href="inicio">Início</a></li>
-                    <li><a href="#">Categorias</a></li>
-                    <li><a href="#">Ofertas</a></li>
-                    <li><a href="#">Contato</a></li>
+                    <li><a href="/">Início</a></li>
+                    <li><a href="/contact">Contato</a></li>
                     <li><a href="carrinho">Carrinho (<span id="cart-count">0</span>)</a></li>
+                    <li id="login-area">
+                        <button class="login-button" onclick="toggleLoginForm()">Login</button>
+                        <a href="{{ url_for('static', filename='template/minha_conta.html') }}" id="account-link" style="display: none;">Minha Conta</a>
+                    </li>
                 </ul>
             </nav>
         </div>
@@ -25,37 +26,17 @@
     
     <main>
         <div class="container" id="inicio">
-            <section class="products">
-                <article class="product">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMclx6Edjn36P9kQHc1r5s_ARvlP75L3fZcw&s" alt="Produto 1">
-                    <h2>Produto 1</h2>
-                    <p>Descrição do produto 1</p>
-                    <p class="price">R$ 99,90</p>
-                    <button class="add-to-cart" onclick="addToCart('Produto 1', 99.90)">Adicionar ao Carrinho</button>
-                </article>
-                <article class="product">
-                    <img src="https://img.terabyteshop.com.br/produto/p/mousepad-gamer-redragon-p026-rgb-grande_82224.jpg" alt="Produto 2">
-                    <h2>Produto 2</h2>
-                    <p>Descrição do produto 2</p>
-                    <p class="price">R$ 199,90</p>
-                    <button class="add-to-cart" onclick="addToCart('Produto 2', 199.90)">Adicionar ao Carrinho</button>
-                </article>
-                <!-- Adicione mais produtos aqui -->
+            <section class="products" id="product-list">
+                <!-- Os produtos serão adicionados aqui via JavaScript -->
             </section>
         </div>
     </main>
-    
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 Minha Loja. Todos os direitos reservados.</p>
-        </div>
-    </footer>
 
     <!-- Formulário de Login -->
     <div class="login-form" id="loginForm">
         <div class="login-form-content">
             <h2>Login</h2>
-            <form action="/login" method="post">
+            <form action="/login" method="post" onsubmit="handleLogin(event)">
                 <label for="email">E-mail:</label>
                 <input type="email" id="email" name="email" required>
                 
@@ -81,7 +62,15 @@
             }
         }
 
-        // Atualização do código existente
+        function handleLogin(event) {
+            event.preventDefault(); // Evita o envio do formulário para processar manualmente
+            // Aqui você deve adicionar a lógica de autenticação e redirecionamento
+
+            // Simulação de login bem-sucedido
+            document.querySelector('.login-button').style.display = 'none'; // Oculta o botão de login
+            document.getElementById('account-link').style.display = 'inline'; // Exibe o link "Minha Conta"
+            toggleLoginForm(); // Fecha o formulário de login
+        }
 
         function addToCart(name, price) {
             cartCount++;
@@ -92,9 +81,34 @@
             localStorage.setItem('cartItems', JSON.stringify(cartItems));
         }
 
-
         // Atualiza a contagem de itens no carrinho ao carregar a página
         document.getElementById('cart-count').innerText = cartItems.length;
+        async function fetchProducts() {
+            try {
+                const response = await fetch('/');
+                const produtos = await response.json();
+                const productList = document.getElementById('product-list');
+                productList.innerHTML = ''; // Limpa a lista atual de produtos
+    
+                produtos.forEach(produto => {
+                    const productItem = document.createElement('article');
+                    productItem.className = 'product';
+                    productItem.innerHTML = `
+                        <img src="${produto.imagem_url}" alt="${produto.nome}">
+                        <h2>${produto.nome}</h2>
+                        <p>${produto.descricao}</p>
+                        <p class="price">R$ ${produto.preco.toFixed(2)}</p>
+                        <button class="add-to-cart" onclick="addToCart('${produto.nome}', ${produto.preco})">Adicionar ao Carrinho</button>
+                    `;
+                    productList.appendChild(productItem);
+                });
+            } catch (error) {
+                console.error('Erro ao buscar produtos:', error);
+            }
+        }
+    
+        // Chama a função para buscar os produtos quando a página carregar
+        document.addEventListener('DOMContentLoaded', fetchProducts);
     </script>
 </body>
 </html>

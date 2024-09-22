@@ -101,15 +101,14 @@ class Database:
         if self.conexao and self.conexao.is_connected():
             try:
                 cursor = self.conexao.cursor()
-                cursor.execute("SELECT * FROM Produto;")
+                cursor.execute("SELECT nome, descricao, preco, imagem_url FROM Produto;")  # Ajuste conforme sua tabela
                 registros = cursor.fetchall()
-                print("Total de produtos registrados:", cursor.rowcount)
-                for linha in registros:
-                    print("id:", linha[0], "nome:", linha[1])
-                return registros
+                return [{'nome': linha[0], 'descricao': linha[1], 'preco': linha[2], 'imagem_url': linha[3]} for linha in registros]
             except Error as e:
                 print("Erro ao listar produtos", e)
                 return []
+
+    
 
 class Cliente:
     def __init__(self, nome: str, email: str, dataNasc: str, senha: str) -> None:
@@ -143,7 +142,11 @@ app = Flask(__name__)
 
 @app.route('/')
 def inicio():
-    return render_template('mainPrincipal.html')
+    db = Database()
+    produtos = db.listarProdutos()  # Busca os produtos do banco de dados
+    db.fecha()
+    return render_template('mainPrincipal.html', produtos=produtos)
+
 
 @app.route('/cadastro', methods=['GET', 'POST'])
 def cadastro():
@@ -248,6 +251,10 @@ def finalizar_compra_page():
 @app.route('/carrinho', methods=['GET', 'POST'])
 def mostrarCarrinho():
     return render_template('carrinho.html')
+
+@app.route('/contact', methods=['GET', 'POST'])
+def contato():
+    return render_template('contato.html')
 
 if __name__ == "__main__":
     app.run(debug=True)
