@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrinho - Minha Loja</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/carrinho.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Carrinho de Compras</h1>
+            <nav>
+                <ul>
+                    <li><a href="inicio">Início</a></li>
+                    <li><a href="#">Categorias</a></li>
+                    <li><a href="#">Ofertas</a></li>
+                    <li><a href="#">Contato</a></li>
+                    <li><a href="carrinho">Carrinho (<span id="cart-count">0</span>)</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h2>Itens no Carrinho</h2>
+            <div class="cart-items" id="cart-items">
+                <p>Seu carrinho está vazio.</p>
+            </div>
+            <button class="checkout" onclick="goToCheckout()">Finalizar Compra</button>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Minha Loja. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+
+        function displayCartItems() {
+            const cartItemsContainer = document.getElementById('cart-items');
+            cartItemsContainer.innerHTML = '';
+
+            if (cartItems.length === 0) {
+                cartItemsContainer.innerHTML = '<p>Seu carrinho está vazio.</p>';
+            } else {
+                cartItems.forEach((item, index) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'cart-item';
+                    itemElement.innerHTML = `
+                        <h3>${item.name}</h3>
+                        <p>Preço: R$ ${item.price.toFixed(2)}</p>
+                        <button onclick="removeFromCart(${index})">Remover</button>
+                    `;
+                    cartItemsContainer.appendChild(itemElement);
+                });
+            }
+        }
+
+        function removeFromCart(index) {
+            cartItems.splice(index, 1);
+            localStorage.setItem('cartItems', JSON.stringify(cartItems));
+            displayCartItems();
+            document.getElementById('cart-count').innerText = cartItems.length;
+        }
+
+        function goToCheckout() {
+            if (cartItems.length === 0) {
+                alert('Seu carrinho está vazio! Adicione itens antes de prosseguir.');
+            } else {
+                window.location.href = '/finalizarCompra'; // Ajuste o caminho se necessário
+            }
+        }
+
+        // Exibe os itens no carrinho ao carregar a página
+        displayCartItems();
+        document.getElementById('cart-count').innerText = cartItems.length;
+    </script>
+</body>
+</html>

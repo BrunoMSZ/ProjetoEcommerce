@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finalização de Compra - Minha Loja</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/finalizarCompra.css') }}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Finalização de Compra</h1>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h2>Selecione um Método de Pagamento</h2>
+            <div class="payment-methods">
+                <button onclick="selectPaymentMethod('Cartão de Crédito')">Cartão de Crédito</button>
+                <button onclick="selectPaymentMethod('Cartão de Débito')">Cartão de Débito</button>
+                <button onclick="selectPaymentMethod('Boleto Bancário')">Boleto Bancário</button>
+                <button onclick="selectPaymentMethod('PayPal')">PayPal</button>
+            </div>
+            <button class="finalizar" id="finalizar-button" onclick="finalizarCompra()">Finalizar Compra</button>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Minha Loja. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        let selectedPaymentMethod = '';
+        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+
+        function selectPaymentMethod(method) {
+            selectedPaymentMethod = method;
+            alert(`Método de pagamento selecionado: ${method}`);
+        }
+
+        function finalizarCompra() {
+            if (selectedPaymentMethod === '') {
+                alert('Selecione um método de pagamento.');
+                return;
+            }
+
+            const data = {
+                metodo_pagamento: selectedPaymentMethod,
+                itens: cartItems,
+                pedido_id: 1  // Altere isso para o ID real do pedido
+            };
+
+            fetch('/finalizar_compra', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                // Limpar o carrinho após a compra
+                localStorage.removeItem('cartItems');
+                window.location.href = '/'; // Redirecionar para a página inicial
+            })
+            .catch((error) => {
+                console.error('Erro:', error);
+            });
+        }
+    </script>
+</body>
+</html>
