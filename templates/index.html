@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sonicpads Project</title>
+
+    <!-- Google Font: Chakra Petch -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+    <link rel="shortcut icon" href="{{ url_for('static', filename='images/iconsonic.jpg') }}" type="image/x-icon">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="#hero-section" class="logo">SONICPADS</a>
+        <ul class="nav-links">
+            <li><a href="#product-section">Produtos</a></li>
+            <li><a href="#about-section">Sobre</a></li>
+            <li><a href="#contact-section">Contato</a></li>
+        </ul>
+        <div class="login-cart">
+            <a href="javascript:void(0);" onclick="openPopup()">Log In</a>
+            <a href="javascript:void(0);" onclick="openCheckoutPopup()">Carrinho (0)</a>
+        </div>        
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero-section">
+        <div class="hero-content">
+            <h1>PROJECT SONICPADS</h1>
+            <a href="#product-section">
+                <button>Ep. 0 - Disponível!</button>
+            </a>
+        </div>
+    </section>
+
+    <!-- Product Section -->
+    <section class="product-section" id="product-section">
+        <div class="product-container">
+            {% if produtos %}
+                {% for produto in produtos %}
+                <div class="product">
+                    <div class="product-image">
+                        {% if produto.imagem %}
+                            <img src="data:image/png;base64,{{ produto.imagem }}" alt="{{ produto.nome }}">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='styles/images/default-image.png') }}" alt="Imagem não disponível">
+                        {% endif %}
+                    </div>
+                    <div class="product-details">
+                        <h2>{{ produto.nome }}</h2>
+                        <p class="price">{{ produto.preco }} BRL</p>
+                        <p>{{ produto.descricao }}</p>
+                        <button class="add-to-cart" onclick="addToCart('{{ produto.nome }}', '{{ produto.preco }}', '{{ produto.descricao|e }}', '{{ produto.imagem }}')">+</button>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <p>Nenhum produto disponível.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about-section" id="about-section">
+        <div class="about-container">
+            <h2>SOBRE NÓS</h2>
+            <p>Na Sonicpads, não criamos apenas mousepads; criamos a superfície onde suas ideias tomam forma, onde cada movimento é preciso e cada ação é decisiva. Sabemos que o desempenho começa na base, e é por isso que dedicamos cada detalhe dos nossos produtos para entregar a você a experiência definitiva.</p>
+            <p>Somos apaixonados por inovação e design, e essa paixão se reflete em cada mousepad que produzimos. Combinamos materiais de alta qualidade, tecnologia avançada e uma estética única para garantir que você tenha a confiança necessária para dominar qualquer desafio, seja nos games ou no trabalho.</p>
+            <p>Nossa missão é elevar o padrão, oferecendo produtos que não apenas complementam seu setup, mas que também maximizam seu potencial. Se você valoriza precisão, estilo e durabilidade, você está no lugar certo.</p>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="contact-section" id="contact-section">
+        <div class="contact-container">
+            <h2>CONTATO</h2>
+            <p>Estamos aqui para ajudar! Fique à vontade para nos contatar através dos nossos canais abaixo.</p>
+            <div class="contact-info">
+                <p><strong>E-mail:</strong> <a href="mailto:sonicpadss@gmail.com">sonicpadss@gmail.com</a></p>
+                <p><strong>Telefone:</strong> 4002-8922</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 Sonicpads. Todos os direitos reservados.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='scripts/script.js') }}"></script>
+
+    <!-- Login Popup -->
+    <div id="loginPopup" class="popup">
+        <div class="popup-content">
+            <span class="close" onclick="closePopup()">&times;</span>
+            <h2>Login</h2>
+            <form action="/login" method="POST">
+                <label for="email">Login:</label>
+                <input type="text" id="email" name="email" required>
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="senha" required>
+                <button type="submit">Entrar</button>
+                <button type="button" onclick="openRegisterPopup()">Registrar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let isLoggedIn = false; // Estado inicial
+
+        function openPopup() {
+            document.getElementById('loginPopup').style.display = 'block';
+        }
+
+        async function login() {
+            const email = document.getElementById('email').value;
+            const senha = document.getElementById('password').value;
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: new URLSearchParams({ email, senha })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        isLoggedIn = true;
+                        updateLoginLink();
+                        closePopup(); // Fecha o popup após login
+                    } else {
+                        alert('Login ou senha inválidos');
+                    }
+                } else {
+                    alert('Erro ao tentar realizar o login. Tente novamente.');
+                }
+            } catch (error) {
+                console.error('Erro na autenticação:', error);
+                alert('Erro ao tentar realizar o login. Tente novamente.');
+            }
+        }
+
+        function updateLoginLink() {
+            const loginLink = document.getElementById('loginLink');
+            if (isLoggedIn) {
+                loginLink.textContent = 'Log Out';
+                loginLink.setAttribute('onclick', 'logout()');
+            } else {
+                loginLink.textContent = 'Log In';
+                loginLink.setAttribute('onclick', 'openPopup()');
+            }
+        }
+
+        function logout() {
+            isLoggedIn = false;
+            updateLoginLink();
+            // Adicione lógica para logout se necessário
+        }
+
+        function closePopup() {
+            document.getElementById('loginPopup').style.display = 'none';
+        }
+    </script>
+
+
+    <!-- Registration Popup -->
+    <div id="registerPopup" class="popup" style="display:none;">
+        <div class="popup-content">
+            <span class="close" onclick="closeRegisterPopup()">&times;</span>
+            <h2>Registrar</h2>
+            <form id="registerForm" action="/register" method="POST">
+                <label for="registerName">Nome Completo:</label>
+                <input type="text" id="registerName" name="name" required>
+                
+                <label for="registerEmail">E-mail:</label>
+                <input type="email" id="registerEmail" name="email" required>
+                
+                <label for="registerPassword">Senha:</label>
+                <input type="password" id="registerPassword" name="senha" required>
+                
+                <label for="registerDOB">Data de Nascimento:</label>
+                <input type="date" id="registerDOB" name="data_nasc" required>
+                
+                <button type="submit">Registrar</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Checkout Popup -->
+    <div id="checkoutPopup" class="checkout-popup">
+        <div class="checkout-popup-content">
+            <span class="checkout-close" onclick="closeCheckoutPopup()">&times;</span>
+            <h2>Finalizar Compra</h2>
+
+            <!-- Resumo do Pedido -->
+            <div class="order-summary">
+                <h3>Resumo do Pedido</h3>
+                <ul id="orderItems">
+                    <li class="total">Total: 0.00 BRL</li>
+                </ul>
+            </div>
+
+            <!-- Seção de Endereço -->
+            <div class="address-section">
+                <h3>Endereço de Entrega</h3>
+                <form class="address-grid">
+                    <div class="input-group">
+                        <label for="cep">CEP:</label>
+                        <input type="text" id="cep" name="cep" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="cidade">Cidade:</label>
+                        <input type="text" id="cidade" name="cidade" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="estado">Estado:</label>
+                        <input type="text" id="estado" name="estado" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="rua">Rua:</label>
+                        <input type="text" id="rua" name="rua" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="numero">Número:</label>
+                        <input type="text" id="numero" name="numero" required>
+                    </div>
+                </form>
+            </div>
+
+            <div id="mp-container">
+                <script src="https://www.mercadopago.com.ar/integrations/v1/web-payment-checkout.js"
+                    data-preference-id="1273324264-f92cada3-65b7-4a53-a55b-af7cfb015eb6" data-source="button">
+                </script>
+            </div>
+            <!-- <button type="submit" class="checkout-button" id="payButton">Finalizar Compra</button> -->
+        </div>
+    </div>
+</body>
+</html>
