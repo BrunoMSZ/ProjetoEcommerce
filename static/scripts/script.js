@@ -38,7 +38,7 @@ function closePopup() {
 }
 
 // Fechar o popup se o usuário clicar fora dele
-window.onclick = function(event) {
+window.onclick = function (event) {
     if (event.target == document.getElementById('loginPopup')) {
         closePopup();
     }
@@ -53,7 +53,7 @@ function closeCheckoutPopup() {
 }
 
 // Fechar o popup se o usuário clicar fora dele
-window.onclick = function(event) {
+window.onclick = function (event) {
     if (event.target == document.getElementById('checkoutPopup')) {
         closeCheckoutPopup();
     }
@@ -88,7 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const removeButton = document.createElement('button');
         removeButton.textContent = "X";
         removeButton.className = 'remove-button';
-        removeButton.addEventListener('click', function() {
+        removeButton.addEventListener('click', function () {
             removeFromCart(productName, newItem);
         });
 
@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     cartButtons.forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             const productName = button.closest('.product').querySelector('h2').textContent;
             const priceText = button.closest('.product').querySelector('.price').textContent; // Acessa o preço corretamente
             const price = priceText.replace(' BRL', '').trim(); // Remove ' BRL' e espaços
@@ -161,19 +161,19 @@ function finalizarCompra() {
         },
         body: JSON.stringify(data),
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Compra finalizada com sucesso!');
-            // Fechar o popup e limpar o carrinho
-            closeCheckoutPopup();
-        } else {
-            alert('Erro ao finalizar a compra.');
-        }
-    })
-    .catch(error => {
-        console.error('Erro:', error);
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Compra finalizada com sucesso!');
+                // Fechar o popup e limpar o carrinho
+                closeCheckoutPopup();
+            } else {
+                alert('Erro ao finalizar a compra.');
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+        });
 }
 function openRegisterPopup() {
     document.getElementById('loginPopup').style.display = 'none';  // Fecha a popup de login
@@ -184,11 +184,11 @@ function closeRegisterPopup() {
     document.getElementById('registerPopup').style.display = 'none';  // Fecha a popup de registro
     document.getElementById('loginPopup').style.display = 'block';  // Reabre a popup de login, se necessário
 }
-document.getElementById('registerForm').onsubmit = async function(event) {
+document.getElementById('registerForm').onsubmit = async function (event) {
     event.preventDefault();  // Impede o envio padrão do formulário
 
     const formData = new FormData(this);
-    
+
     const response = await fetch('/register', {
         method: 'POST',
         body: formData
@@ -237,18 +237,18 @@ function finalizarCompra() {
         },
         body: JSON.stringify({ produtos, pagamento }),
     })
-    .then(response => response.json())
-    .then(data => {
-        // Verifique a resposta do servidor
-        if (data.success) {
-            alert('Compra finalizada com sucesso!');
-            closeCheckoutPopup(); // Fecha o popup após a compra
-        } else {
-            alert('Erro ao finalizar compra: ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Erro:', error);
-        alert('Erro ao finalizar compra.');
-    });
+        .then(response => response.json())
+        .then(data => {
+            // Verifique a resposta do servidor
+            if (data.success) {
+                alert('Compra finalizada com sucesso!');
+                closeCheckoutPopup(); // Fecha o popup após a compra
+            } else {
+                alert('Erro ao finalizar compra: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao finalizar compra.');
+        });
 }

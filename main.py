@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import mysql.connector
 from mysql.connector import Error
+from datetime import datetime
 
 class Database:
     def __init__(self):
@@ -132,6 +133,19 @@ class Database:
             finally:
                 cursor.close()
 
+
+    def listarProdutos(self):
+        if self.conexao and self.conexao.is_connected():
+            try:
+                cursor = self.conexao.cursor()
+                cursor.execute("SELECT nome, descricao, preco, imagem_url FROM Produto;")  # Ajuste conforme sua tabela
+                registros = cursor.fetchall()
+                return [{'nome': linha[0], 'descricao': linha[1], 'preco': linha[2], 'imagem_url': linha[3]} for linha in registros]
+            except Error as e:
+                print("Erro ao listar produtos", e)
+                return []
+
+    
 
 class Cliente:
     def __init__(self, nome: str, email: str, dataNasc: str, senha: str) -> None:
