@@ -1,8 +1,7 @@
 
 from flask import Flask, render_template, request, redirect, url_for, jsonify
 import main as m
-from mysql.connector import Error
-from datetime import datetime
+
 app = Flask(__name__)
 
 # Rota para a página principal

@@ -1,7 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify
 import mysql.connector
 from mysql.connector import Error
-from datetime import datetime
 
 class Database:
     def __init__(self):
